@@ -1,0 +1,414 @@
+
+## **Pokemon Dataset**
+
+### Analysing 6 Generations of Pokemon
+
+### LA - 2 Exploratory Data Analysis
+
+#### Submitted By:- Abhinandan S Vishwaroop,1NT21IS005, 5 A
+
+
+### **Introduction**
+
+```{r}
+# The Complete Pokémon Dataset is an extensive and detailed collection of information about Pokémon, fictional creatures from the Pokémon franchise. This dataset goes beyond basic details and encompasses a wide array of attributes, including Pokémon characteristics, abilities, base stats, and evolution stages. It provides a comprehensive overview of all Pokémon across various generations, offering a valuable resource for researchers, gamers, and enthusiasts. Analysts can explore the dataset to uncover patterns, relationships, and trends within the Pokémon world, making it a powerful tool for strategic gameplay analysis. The inclusion of additional features like Mega Evolution and Legendary status adds depth to the dataset, making it a comprehensive reference for understanding the intricate details of each Pokémon. In essence, The Complete Pokémon Dataset serves as an exhaustive and organized repository, enhancing the understanding and appreciation of the diverse Pokémon universe.
+```
+
+
+#### I am using a Pokemon Dataset which only has necessary attributes or columns required for the analysis part.
+
+#### **Explanation of each attribute**
+```{r}
+# Name: Each pokemon's name
+# Type 1: Properties for pokemon and their moves (each type has its own strengths and weaknesses)
+# Type 2: Some pokemon have two types
+# Total: The sum of all stats below
+# HP: Hit points (health)
+# Attack: The base modifier for normal attacks
+# Defense: The stat for protection against normal attacks
+# SP Atk: The base modifier for special attacks
+# SP Def: The stat for protection against special attacks
+# Speed: Determines which pokemon attacks first in each round
+# Generation: The generation of the pokemon
+# Legendary: Whether or not pokemon is legendary
+```
+
+##### Task is to demonstrate 10 Visualization Functions
+
+#### Let's load the **Pokemon Dataset** into R
+
+```{r}
+# Load the Dataset
+
+pokemanz <- read.csv("C:\\Users\\abhiv\\OneDrive\\Desktop\\Pokemon.csv")
+
+
+# Data Summary
+
+summary(pokemanz)
+
+#To find missing values
+any(is.na(pokemanz))
+```
+
+It returned **False** means the dataset has no missing values.
+
+```{r}
+# Retrieves the names of all the columns present in the dataset
+
+names(pokemanz)
+
+# Gives the structure
+str(pokemanz)
+
+# Outputs the initial rows of the dataset
+
+head(pokemanz)
+
+```
+
+#### Load all the necessary libraries required for the analysis.
+
+```{r}
+# `ggplot2` is a powerful and flexible data visualization package in R. Developed by Hadley Wickham, it follows the Grammar of Graphics principles, allowing users to create complex and customized plots with ease.With a wide range of geoms, themes, and options, `ggplot2` is widely used for producing publication-quality plots, making it a preferred choice for data scientists, statisticians, and researchers.
+
+library(ggplot2)
+
+# `repr` in R is a package that provides a flexible and extensible framework for representing data structures, enabling enhanced object representations in various contexts. It allows users to customize the way R objects are displayed, making it particularly useful for improving the interpretability and visual representation of complex data structures in interactive computing environments like Jupyter notebooks.
+
+library(repr)
+
+# `dplyr` is a popular R package for data manipulation and transformation. It provides a set of functions that streamline common data manipulation tasks. With intuitive verbs like `filter`, `mutate`, and `group_by`, `dplyr` simplifies code, making it readable and efficient. It's widely used in data analysis for tasks like filtering rows, creating new variables, and aggregating data, enhancing the overall workflow.
+
+library(dplyr)
+
+# `tidyr` is an R package designed for tidy data manipulation. Developed by Hadley Wickham, it complements the `dplyr` package by providing functions like `gather` and `spread` for reshaping datasets. `tidyr` focuses on organizing data into a tidy format where each variable has its column, each observation has its row, and each value has its cell. It's instrumental in cleaning and restructuring data for effective analysis and visualization.
+
+library(tidyr)
+
+# `Hmisc` is an R package designed for advanced statistical analysis and data exploration. It extends the functionality of base R by providing additional tools for handling missing data, creating informative summary statistics, and conducting advanced regression modeling. `Hmisc` is particularly useful in biomedical and clinical research for its comprehensive set of functions addressing various aspects of statistical analysis and data manipulation.
+
+library(Hmisc)
+
+# `corrplot` is an R package for visualizing correlation matrices. It provides functions to create visually appealing and informative correlation plots. `corrplot` is widely used for exploring relationships between variables by displaying color-coded correlation coefficients. It supports various customization options, making it easy to interpret complex correlation structures in datasets, aiding researchers and analysts in making data-driven decisions.
+
+library(corrplot)
+```
+
+### Basic Plots
+
+```{r}
+# Scatter Plot of Attack vs Defense
+
+ggplot(data = pokemanz, aes(x = Attack, y = Defense)) +
+  geom_point() +
+  labs(title = "Scatter Plot of Attack vs Defense", x = "Attack", y = "Defense")
+
+```
+
+
+```{r}
+# Distribution of Legendary Pokemon using BarPlot
+
+ggplot(data = pokemanz, aes(x = Legendary)) +
+  geom_bar() +
+  labs(title = "Distribution of Legendary Pokemon", x = "Legendary", y = "Count")
+
+```
+
+#### **Analysis**
+
+*We can observe that most of the pokemons are not LEGENDARY*
+
+```{r}
+# Pie Chart of Pokemon Types (Type1)
+
+type_counts <- pokemanz %>% count(Type1)
+ggplot(data = type_counts, aes(x = "", y = n, fill = Type1)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar(theta = "y") +
+  labs(title = "Pie Chart of Pokemon Types (Type1)", x = NULL, y = NULL)
+
+```
+
+```{r}
+# Stacked Bar Plot of Pokemon Types (Type1 and Type2)
+
+pokemanz_long <- pokemanz %>% gather(key = "Type", value = "Value", Type1, Type2) 
+ggplot(data = pokemanz_long, aes(x = Type, fill = Type)) +
+  geom_bar() +
+  labs(title = "Stacked Bar Plot of Pokemon Types (Type1 and Type2)", x = "Type", y = "Count") +
+  theme(legend.position="none")
+
+```
+
+```{r}
+# Correlation Heatmap of Numeric Variables
+
+cor_matrix <- cor(pokemanz[, c("Total", "HP", "Attack", "Defense", "SpAtk", "SpDef", "Speed")])
+corrplot(cor_matrix, method = "color")
+
+```
+
+### Some other Visualizations:-
+
+```{r}
+# The below chunk of code produces a histogram for Total attribute
+
+qplot(pokemanz$Total, geom ="histogram", binwidth = 6, main = "Histogram for Pokemon Total",
+      xlab = "Total", fill = I("#ffc8dd"), col = I("red"), alpha = I(.2),
+      xlim = c(200, 800))
+
+```
+
+```{r}
+# # The below chunk of code produces a histogram for Speed attribute
+
+qplot(pokemanz$Speed, geom ="histogram", binwidth = 3, main = "Histogram for Pokemon Speed",
+      xlab = "Speed", fill = I("#faedcd"), col = I("#d4a373"), alpha = I(.2),
+      xlim = c(1, 200))
+```
+
+```{r}
+# # The below chunk of code produces a histogram for Attack attribute
+
+qplot(pokemanz$Attack, geom ="histogram", binwidth = 3, main = "Histogram for Pokemon Attack",
+      xlab = "Attack", fill = I("blue"), col = I("red"), alpha = I(.2),
+      xlim = c(1, 200))
+```
+
+```{r}
+# The below chunk of code produces a histogram for Special Attack attribute
+
+qplot(pokemanz$SpAtk, geom ="histogram", binwidth = 3, main = "Histogram for Pokemon Special Attack",
+      xlab = "Special Attack", fill = I("#ff99c8"), col = I("red"), alpha = I(.2),
+      xlim = c(1, 200))
+
+```
+
+```{r}
+# The below chunk of code produces a histogram for Defense attribute
+
+qplot(pokemanz$Defense, geom ="histogram", binwidth = 3, main = "Histogram for Pokemon Defense",
+      xlab = "Defense", fill = I("#8eecf5"), col = I("red"), alpha = I(.2),
+      xlim = c(1, 200))
+```
+
+```{r}
+# The below chunk of code produces a histogram for Special Defense attribute
+
+qplot(pokemanz$SpDef, geom ="histogram", binwidth = 3, main = "Histogram for Pokemon Special Defense",
+      xlab = "Special Defense", fill = I("#d00000"), col = I("#ffeedd"), alpha = I(.2),
+      xlim = c(15, 200))
+
+```
+
+```{r}
+# The below chunk of code produces a histogram for Pokemon HP attribute
+
+qplot(pokemanz$HP, geom ="histogram", binwidth = 3, main = "Histogram for Pokemon HP",
+      xlab = "HP", fill = I("blue"), col = I("#f1c0e8"), alpha = I(.2),
+      xlim = c(15, 200))
+
+```
+
+```{r}
+# The given code creates a histogram and density plot for the "Total" attribute in the "pokemanz" dataset using the ggplot2 package in R.
+
+ggplot(data=pokemanz, aes(pokemanz$Total)) +
+  geom_histogram(aes(y=..density..),
+                 breaks = seq(200, 800, by = 15),
+                 col = "blue",
+                 fill = "orange",
+                 alpha = .5) +
+  geom_density(col = 2) +
+  labs(title = "Histogram of Pokemon Total") +
+  labs(x = "Total", y = "Count")
+```
+
+```{r}
+# The given code produces a combined plot with both a violin plot and a box plot to visualize the distribution of the 'Speed' variable in the Pokémon dataset.
+
+ggplot(data = pokemanz, aes(x = factor(1), y = Speed)) +
+  geom_violin(fill = "pink", alpha = 0.5) +
+  geom_boxplot(width = 0.1, fill = "red", alpha = 0.5) +
+  labs(title = "Violin Plot of Pokemon Speed") +
+  labs(x = "", y = "Speed") +
+  theme_minimal()
+
+```
+
+```{r}
+# The provided R code creates a boxplot for the "Attack" attribute in the "pokemanz" dataset using the ggplot2 package. 
+
+ggplot(data = pokemanz, aes(x = Attack)) +
+  geom_boxplot(col = "red", fill = "green", alpha = 0.5) +
+  labs(title = "Whisker of Pokemon Attack") +
+  labs(x = "Attack", y = "Count")
+
+```
+
+```{r}
+#The provided R code generates a boxplot to visualize the distribution of the "Special Attack" attribute in the Pokémon dataset.
+
+ggplot(data = pokemanz, aes(x = SpAtk)) +
+  geom_boxplot(col = "blue", fill = "orange", alpha = 0.5) +
+  labs(title = "Boxplot of Pokemon Special Attack") +
+  labs(x = "Special Attack", y = "Count")
+
+```
+
+```{r}
+#  Cumulative Distribution Function (CDF) plot represents the cumulative probability distribution of a continuous random variable. In the context of data visualization, a CDF plot shows the probability that a random variable takes on a value less than or equal to a given value.
+
+# In the CDF plot:
+
+# The x-axis represents the values of the variable.
+# The y-axis represents the cumulative probability that the variable is less than or equal to the corresponding x-axis value.
+
+ggplot(data = pokemanz, aes(x = Defense)) +
+  stat_ecdf(geom = "step", col = "gold", size = 1) +
+  labs(title = "CDF Plot of Pokemon Defense") +
+  labs(x = "Defense", y = "Cumulative Probability")
+
+```
+
+```{r}
+# A kernel density plot, often referred to as a kernel density estimate (KDE), is a non-parametric way to estimate the probability density function of a continuous random variable.
+
+ggplot(data = pokemanz, aes(x = pokemanz$HP)) +
+  geom_density(col = "purple", fill = "yellow", alpha = 0.5) +
+  labs(title = "Kernel Density Plot of Pokemon HP") +
+  labs(x = 'HP', y = "Density")
+
+```
+
+
+### I am using ***density plots and facet wraps*** to analyze each attribute.
+
+##### facet_wrap() is a function in ggplot2 (an R package for creating static, animated, and interactive visualizations) that allows you to create a grid of small multiples (facets) based on a categorical variable. It's a convenient way to split your data into subsets and create separate plots for each subset, displayed in a grid.
+
+##### facet_wrap(~variable)
+##### The tilde (~) symbol is used to specify the variable you want to use for faceting.
+##### variable is the categorical variable based on which you want to create separate plots.
+```{r}
+# This R code generates a faceted density plot using the ggplot2 package.
+# This code creates a set of density plots using ggplot2 in R for the Total scores of Pokemon, grouped by the Type1 variable. 
+
+pokemanz_plot01 <- ggplot(pokemanz, aes(x=Total, fill=Type1)) + geom_density(alpha = 1)
+pokemanz_plot01 <- pokemanz_plot01 + 
+  facet_wrap(~Type1) + 
+  labs(x = "Total", y = "Density", title = "Pokemon Total Score (Type 1)") +
+  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+
+pokemanz_plot01
+
+```
+
+```{r}
+pokemanz_plot02 <- ggplot(pokemanz, aes(x=Total, fill=Type1)) + geom_density(alpha = 1)
+pokemanz_plot02<- pokemanz_plot02 + 
+  facet_wrap(~Type1) + 
+  labs(x = "Speed", y = "Density", title ="Pokemon Speed Score") +
+  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+
+pokemanz_plot02
+```
+
+
+```{r}
+pokemanz_plot03 <- ggplot(pokemanz, aes(x=Attack, fill=Type1)) + geom_density(alpha = 1)
+pokemanz_plot03 <- pokemanz_plot03 + 
+  facet_wrap(~Type1) + 
+  labs(x = "Attack", y = "Density", title ="Pokemon Attack Score") +
+  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+
+pokemanz_plot03
+```
+
+
+```{r}
+pokemanz_plot04 <- ggplot(pokemanz, aes(x=SpAtk, fill=Type1)) + geom_density(alpha = 1)
+pokemanz_plot04 <- pokemanz_plot04 + 
+  facet_wrap(~Type1) + 
+  labs(x = "Special Attack", y = "Density", title ="Pokemon Special Attack Score") +
+  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+
+pokemanz_plot04
+```
+
+```{r}
+pokemanz_plot05 <- ggplot(pokemanz, aes(x=Defense, fill=Type1)) + geom_density(alpha = 1)
+pokemanz_plot05<- pokemanz_plot05 + 
+  facet_wrap(~Type1) + 
+  labs(x = "Defense", y = "Density", title ="Pokemon Defense Score") +
+  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+
+pokemanz_plot05
+```
+
+```{r}
+pokemanz_plot06 <- ggplot(pokemanz, aes(x=SpDef, fill=Type1)) + geom_density(alpha = 1)
+pokemanz_plot06<- pokemanz_plot06 + 
+  facet_wrap(~Type1) + 
+  labs(x = "Special Defense", y = "Density", title ="Pokemon Special Defense Score") +
+  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+
+pokemanz_plot06
+
+```
+
+```{r}
+pokemanz_plot07 <- ggplot(pokemanz, aes(x=HP, fill=Type1)) + geom_density(alpha = 1)
+pokemanz_plot07<- pokemanz_plot07 + 
+  facet_wrap(~Type1) + 
+  labs(x = "HP", y = "Density", title ="Pokemon HP Score") +
+  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+
+pokemanz_plot07
+```
+
+
+### **Different Types of Visualizations used for Analysis**
+
+1. Bar Plot
+2. Scatter Plot
+3. Correlation Heatmap
+4. Density Plot
+5. Pie Chart
+6. Stacked Bar Plot
+7. Histogram
+8. Facet Wrap
+9. Violin Plot
+10. Box Plot
+11. Whisker Plot
+12. Cumulative Distribution Function (CDF) Plot
+13. Kernel Density Plot**
+
+
+### **Conclusion**
+
+**1. Total Score Distribution:** The density plots for the Total scores of Pokemon, grouped by Type1, provide insights into the distribution of Pokemon based on their overall strength. Different types exhibit varying total score distributions.
+
+**2. Speed Distribution:** The density plots for the Speed scores of Pokemon, grouped by Type1, show the speed distribution within each Pokemon type.
+
+**3. Attack and Special Attack Distributions:** The density plots for Attack and Special Attack scores reveal the distribution of offensive capabilities among different Pokemon types.
+
+**4. Defense and Special Defense Distributions:** The density plots for Defense and Special Defense scores showcase the defensive capabilities of Pokemon across different types.
+
+**5. HP Distribution:** The density plots for HP scores illustrate the distribution of hit points, representing the health of Pokemon, for various types.
+
+**6. Legendary Pokemon Distribution:** The bar plot shows the distribution of Legendary Pokemon, indicating that most Pokemon in the dataset are not legendary.
+
+**7. Pokemon Type Distribution:** The pie chart and stacked bar plot provide insights into the distribution of Pokemon types (Type1 and Type2), indicating the prevalence of different types in the dataset.
+
+**8. Correlation Heatmap:** The correlation heatmap visualizes the relationships between numeric attributes, helping identify patterns and potential correlations among different stats.
+
+**9. Cumulative Distribution Function (CDF) Plot:** The CDF plot for Pokemon Defense illustrates the cumulative probability distribution of defense scores, offering insights into the overall defensive capabilities of Pokemon.
+
+**10. Kernel Density Plot for HP:** The kernel density plot for HP shows the probability density function of hit points, giving an overview of the distribution of health scores among Pokemon.
+
+
+
+
+### **Github Link** :-
